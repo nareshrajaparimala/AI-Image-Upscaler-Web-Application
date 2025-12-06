@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Sparkles, Zap, Download, RotateCcw, Loader2 } from 'lucide-react';
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
-import { upscaleWithWorker } from '@/utils/optimizedUpscaler';
+
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
@@ -49,11 +49,19 @@ export default function Home() {
     setError(null);
 
     try {
-      const result = await upscaleWithWorker(originalImage, scale);
-      setUpscaledImage(result);
+      const response = await fetch('/api/upscale', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: originalImage })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+
+      setUpscaledImage(data.url);
       
       const newItem: HistoryItem = {
-        result,
+        result: data.url,
         timestamp: new Date().toLocaleString()
       };
       setHistory(prev => [newItem, ...prev].slice(0, 5));
@@ -171,7 +179,7 @@ export default function Home() {
                   <Sparkles className="absolute inset-4 text-blue-600 animate-pulse" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">AI is enhancing your image...</h3>
-                <p className="text-gray-600">Processing on your device • {scale === 4 ? '5-10 seconds' : '2-5 seconds'}</p>
+                <p className="text-gray-600">Processing with Cloudinary AI • This may take a few seconds</p>
               </div>
             </div>
           )}
