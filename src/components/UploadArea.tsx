@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, X, AlertCircle, Image, Sparkles, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 interface UploadAreaProps {
   onImageSelect: (file: File, dataUrl: string) => void;
@@ -18,12 +20,16 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
     const maxSize = 5 * 1024 * 1024; // 5MB
 
     if (!validTypes.includes(file.type)) {
-      setError('Please upload JPG, PNG, or WebP files only');
+      const msg = 'Please upload JPG, PNG, or WebP files only';
+      setError(msg);
+      toast.error(msg);
       return false;
     }
 
     if (file.size > maxSize) {
-      setError('File is too large. Maximum size is 5MB');
+      const msg = 'Image too large for browser processing. Please use an image under 5MB.';
+      setError(msg);
+      toast.error(msg, { duration: 4000 });
       return false;
     }
 
@@ -99,8 +105,9 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {!selectedImage ? (
-        <div
-          className={`group relative overflow-hidden border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-500 transform hover:scale-[1.02] ${
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className={`group relative overflow-hidden border-3 border-dashed rounded-2xl p-12 text-center transition-all duration-500 ${
             dragActive
               ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-100 shadow-2xl scale-[1.02]'
               : 'border-gray-300 bg-gradient-to-br from-gray-50 to-white hover:border-blue-400 hover:shadow-xl'
@@ -109,7 +116,6 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          {/* Animated background */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="absolute top-4 left-4 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
             <div className="absolute top-4 right-4 w-32 h-32 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
@@ -117,15 +123,23 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
           </div>
           
           <div className="relative z-10">
-            <div className={`mx-auto w-20 h-20 mb-6 relative ${
-              dragActive ? 'animate-bounce' : 'group-hover:animate-pulse'
-            }`}>
+            <motion.div
+              animate={{ scale: dragActive ? [1, 1.1, 1] : 1 }}
+              transition={{ duration: 0.6, repeat: dragActive ? Infinity : 0 }}
+              className="mx-auto w-20 h-20 mb-6 relative"
+            >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
               <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-2xl">
                 <Upload className="w-12 h-12 text-white" />
               </div>
-              <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-500 animate-spin" />
-            </div>
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                className="absolute -top-2 -right-2"
+              >
+                <Sparkles className="w-6 h-6 text-yellow-500" />
+              </motion.div>
+            </motion.div>
             
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
               {dragActive ? 'Drop your image here!' : 'Upload your image'}
@@ -169,7 +183,7 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       ) : (
         <div className="relative group">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
@@ -193,7 +207,12 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
       )}
 
       {error && (
-        <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl shadow-lg animate-shake">
+        <motion.div
+          initial={{ x: -10 }}
+          animate={{ x: [0, 10, -10, 10, 0] }}
+          transition={{ duration: 0.5 }}
+          className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl shadow-lg"
+        >
           <div className="flex items-center">
             <AlertCircle className="h-6 w-6 text-red-500 mr-3 animate-pulse" />
             <div>
@@ -201,7 +220,7 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
               <p className="text-red-700">{error}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
