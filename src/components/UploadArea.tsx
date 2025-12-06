@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { Upload, X, AlertCircle, Image, Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface UploadAreaProps {
-  onImageSelect: (file: File) => void;
+  onImageSelect: (file: File, dataUrl: string) => void;
 }
 
 export default function UploadArea({ onImageSelect }: UploadAreaProps) {
@@ -36,10 +36,11 @@ export default function UploadArea({ onImageSelect }: UploadAreaProps) {
       setIsUploading(true);
       const reader = new FileReader();
       reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
         setTimeout(() => {
-          setSelectedImage(e.target?.result as string);
+          setSelectedImage(dataUrl);
           setIsUploading(false);
-          onImageSelect(file);
+          onImageSelect(file, dataUrl);
         }, 800);
       };
       reader.readAsDataURL(file);
