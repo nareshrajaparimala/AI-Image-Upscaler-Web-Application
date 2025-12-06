@@ -17,6 +17,8 @@ import GridProgressMap from '@/components/GridProgressMap';
 import StitchingLoader from '@/components/StitchingLoader';
 import BeforeAfterSlider from '@/components/BeforeAfterSlider';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import WorkflowSection from '@/components/WorkflowSection';
+import FeedbackForm from '@/components/FeedbackForm';
 import { getErrorMessage } from '@/utils/errorMessages';
 
 interface HistoryItem {
@@ -241,7 +243,9 @@ export default function Home() {
           )}
         </div>
         <AICapabilities />
+        <WorkflowSection />
       </main>
+      <FeedbackForm />
       <Footer />
     </div>
   );
