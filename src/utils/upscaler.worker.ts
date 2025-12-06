@@ -7,11 +7,7 @@ self.onmessage = async (e: MessageEvent) => {
   
   try {
     const model = scale === 2 ? x2 : x4;
-    const upscaler = new Upscaler({
-      model,
-      patchSize: 64,
-      padding: 2
-    });
+    const upscaler = new Upscaler({ model });
     
     const result = await upscaler.upscale(imageData);
     self.postMessage({ success: true, result });
