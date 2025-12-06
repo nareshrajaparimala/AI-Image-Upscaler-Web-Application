@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle2, Sparkles, Zap, Download, RotateCcw, Loader2 } from 'lucide-react';
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
-import Upscaler from 'upscaler';
-import x2 from '@upscalerjs/esrgan-slim/2x';
-import x4 from '@upscalerjs/esrgan-slim/4x';
+import { upscaleWithWorker } from '@/utils/optimizedUpscaler';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
@@ -51,12 +49,9 @@ export default function Home() {
     setError(null);
 
     try {
-      const selectedModel = scale === 2 ? x2 : x4;
-      const upscaler = new Upscaler({ model: selectedModel });
-      const result = await upscaler.upscale(originalImage);
+      const result = await upscaleWithWorker(originalImage, scale);
       setUpscaledImage(result);
       
-      // Add to history
       const newItem: HistoryItem = {
         result,
         timestamp: new Date().toLocaleString()
