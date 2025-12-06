@@ -3,7 +3,7 @@ import x2 from '@upscalerjs/esrgan-slim/2x';
 import x4 from '@upscalerjs/esrgan-slim/4x';
 import * as tf from '@tensorflow/tfjs';
 
-const MAX_DIMENSION = 512;
+const MAX_DIMENSION = 400;
 
 const resizeImage = (img: HTMLImageElement): HTMLCanvasElement => {
   const canvas = document.createElement('canvas');
@@ -34,11 +34,7 @@ export const upscaleWithWorker = async (imageData: string, scale: 2 | 4): Promis
   img.src = '';
   
   const model = scale === 2 ? x2 : x4;
-  const upscaler = new Upscaler({
-    model,
-    patchSize: 32,
-    padding: 1
-  });
+  const upscaler = new Upscaler({ model });
   
   const memDuring = (performance as any).memory?.usedJSHeapSize || 0;
   console.log(`🟡 Memory During: ${(memDuring / 1024 / 1024).toFixed(2)} MB (+${((memDuring - memStart) / 1024 / 1024).toFixed(2)} MB)`);
