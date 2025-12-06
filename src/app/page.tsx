@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, Sparkles, Zap, Download, RotateCcw, Loader2 } from 'lucide-react';
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
 import Upscaler from 'upscaler';
@@ -10,6 +10,14 @@ import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
 import UploadArea from '@/components/UploadArea';
+import Sidebar from '@/components/Sidebar';
+import AICapabilities from '@/components/AICapabilities';
+import LoadingScreen from '@/components/LoadingScreen';
+
+interface HistoryItem {
+  result: string;
+  timestamp: string;
+}
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -18,6 +26,16 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scale, setScale] = useState<2 | 4>(4);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoadingScreen(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleImageSelect = (file: File, dataUrl: string) => {
     setSelectedFile(file);
@@ -37,6 +55,13 @@ export default function Home() {
       const upscaler = new Upscaler({ model: selectedModel });
       const result = await upscaler.upscale(originalImage);
       setUpscaledImage(result);
+      
+      // Add to history
+      const newItem: HistoryItem = {
+        result,
+        timestamp: new Date().toLocaleString()
+      };
+      setHistory(prev => [newItem, ...prev].slice(0, 5));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -68,9 +93,19 @@ export default function Home() {
     setError(null);
   };
 
+  if (showLoadingScreen) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
-      <Header />
+      <Header onProfileClick={() => setSidebarOpen(true)} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+        history={history}
+        onClear={() => setHistory([])}
+      />
       <main className="flex-1">
         <Hero />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -186,6 +221,7 @@ export default function Home() {
             </div>
           )}
         </div>
+        <AICapabilities />
       </main>
       <Footer />
     </div>

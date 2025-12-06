@@ -1,6 +1,10 @@
-import { Zap, Sparkles } from 'lucide-react';
+import { Zap, Sparkles, UserCircle } from 'lucide-react';
 
-export default function Header() {
+interface HeaderProps {
+  onProfileClick: () => void;
+}
+
+export default function Header({ onProfileClick }: HeaderProps) {
   return (
     <header className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,6 +23,15 @@ export default function Header() {
               <Sparkles className="h-5 w-5 text-purple-500 animate-pulse" />
             </div>
           </div>
+          <button 
+            onClick={onProfileClick} 
+            className='relative group'
+          >
+            <div className='absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-md opacity-0 group-hover:opacity-75 transition-opacity'></div>
+            <div className='relative p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110'>
+              <UserCircle className='w-6 h-6 text-white' />
+            </div>
+          </button>
         </div>
       </div>
     </header>
